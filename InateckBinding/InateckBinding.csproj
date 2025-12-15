@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
+    <IsBindingProject>true</IsBindingProject>
+
+    <!-- Información del paquete -->
+    <PackageId>InateckBinding</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Tenaris</Authors>
+    <Company>Tenaris</Company>
+    <Product>Inatek Scanner Binding</Product>
+    <Description>Android Binding Library for Inatek BCST-75S Scanner SDK</Description>
+    <Copyright>Copyright © 2025</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- JAR principal de Inatek -->
+    <EmbeddedJar Include="Jars\inateck-scanner-ble-2-0-0.jar" />
+
+    <!-- Dependencias JNA -->
+    <EmbeddedJar Include="Jars\jna-min.jar" />
+    <EmbeddedJar Include="Jars\jna-platform.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Transformaciones y metadata -->
+    <TransformFile Include="Transforms\Metadata.xml" Condition="Exists('Transforms\Metadata.xml')" />
+    <TransformFile Include="Transforms\EnumFields.xml" Condition="Exists('Transforms\EnumFields.xml')" />
+    <TransformFile Include="Transforms\EnumMethods.xml" Condition="Exists('Transforms\EnumMethods.xml')" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Dependencias NuGet necesarias -->
+    <PackageReference Include="Xamarin.Kotlin.StdLib" Version="1.9.10" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.7" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,107 @@
+========================================
+  COMPILACIÓN RÁPIDA - INATEK SCANNER
+========================================
+
+OPCIÓN 1: SCRIPTS AUTOMÁTICOS (Recomendado)
+--------------------------------------------
+
+1. Abrir PowerShell en esta carpeta
+
+2. Ejecutar script de compilación:
+   .\build.ps1
+
+3. Conectar dispositivo Android vía USB
+
+4. Ejecutar script de deploy:
+   .\deploy.ps1 -Run
+
+
+OPCIÓN 2: VISUAL STUDIO
+-----------------------
+
+1. Abrir: InateckScanner.sln
+
+2. Compilar:
+   Build → Build Solution (Ctrl + Shift + B)
+
+3. Ejecutar:
+   Presionar F5
+
+
+OPCIÓN 3: LÍNEA DE COMANDOS MANUAL
+-----------------------------------
+
+1. Restaurar dependencias:
+   dotnet restore InateckScanner.sln
+
+2. Compilar binding:
+   dotnet build InateckBinding\InateckBinding.csproj -c Debug
+
+3. Compilar app MAUI:
+   dotnet build InateckMauiApp\InateckMauiApp.csproj -c Debug -f net8.0-android34.0
+
+4. Generar APK:
+   dotnet publish InateckMauiApp\InateckMauiApp.csproj -c Debug -f net8.0-android34.0 -o output
+
+5. Instalar en dispositivo:
+   adb install -r output\*.apk
+
+
+VERIFICAR REQUISITOS
+--------------------
+
+✓ .NET SDK 8.0 instalado:
+  dotnet --version
+
+✓ Android SDK instalado:
+  adb version
+
+✓ Dispositivo Android conectado:
+  adb devices
+
+
+SOLUCIÓN RÁPIDA DE PROBLEMAS
+-----------------------------
+
+• Error "dotnet no encontrado":
+  → Instalar .NET 8 SDK desde: https://dotnet.microsoft.com/download
+
+• Error "adb no encontrado":
+  → Instalar Android SDK Platform Tools
+
+• Error "No hay dispositivos":
+  → Conectar Android vía USB
+  → Habilitar "Depuración USB" en el dispositivo
+  → Ejecutar: adb devices
+
+• Error al compilar binding:
+  → Verificar que existen los JARs en: InateckBinding\Jars\
+  → Revisar: InateckBinding\Transforms\Metadata.xml
+
+
+MÁS INFORMACIÓN
+---------------
+
+• Guía completa: docs\BUILD_AND_DEPLOY.md
+• Scripts: SCRIPTS_README.md
+• Configuración DataMatrix: docs\DATAMATRIX_CONFIG.md
+
+
+RESULTADO ESPERADO
+------------------
+
+✓ Build succeeded
+  → 2 proyectos compilados
+  → InateckBinding.dll generado
+  → InateckMauiApp.dll generado
+  → APK generado en: output\
+
+✓ App instalada en dispositivo Android
+✓ App funcionando correctamente
+✓ Escáner configurado para DataMatrix
+
+
+CONTACTO
+--------
+
+Para soporte técnico, consulta la documentación en docs/

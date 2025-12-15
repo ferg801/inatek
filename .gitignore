@@ -1,0 +1,121 @@
+# ========================================
+# .gitignore para .NET MAUI + Android Binding
+# ========================================
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+output/
+
+# Visual Studio
+.vs/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# MonoDevelop
+*.pidb
+*.booproj
+*.svd
+*.pdb
+
+# Unity3D
+*.stackdump
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# User-specific files
+*.rsuser
+
+# Mono auto generated files
+mono_crash.*
+
+# Build results folders
+[Bb]in/
+[Oo]bj/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+
+# ASP.NET
+**/wwwroot/lib/
+
+# Rider
+.idea/
+
+# macOS
+.DS_Store
+*.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Android
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Local configuration files
+*.user
+appsettings.Development.json
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.log
+
+# Resource files (keep)
+!**/Resources/**
+
+# Keep JAR files for binding
+!**/Jars/*.jar
+
+# Keep documentation
+!*.md
+!docs/**
+
+# Keep scripts
+!*.ps1
+!*.sh
+!*.txt
+
+# VS Code workspace settings (keep base, ignore local)
+!.vscode/
+.vscode/*
+!.vscode/extensions.json

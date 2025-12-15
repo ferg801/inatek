@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<application
+		android:allowBackup="true"
+		android:icon="@mipmap/appicon"
+		android:roundIcon="@mipmap/appicon_round"
+		android:supportsRtl="true"
+		android:label="@string/app_name">
+	</application>
+
+	<!-- =====================================================
+	     PERMISOS BLUETOOTH (Legacy - Android < 12)
+	     ===================================================== -->
+	<uses-permission android:name="android.permission.BLUETOOTH"
+					android:maxSdkVersion="30" />
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+					android:maxSdkVersion="30" />
+
+	<!-- =====================================================
+	     PERMISOS BLUETOOTH (Android 12+)
+	     ===================================================== -->
+	<!-- Escaneo de dispositivos BLE -->
+	<uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+					android:usesPermissionFlags="neverForLocation" />
+
+	<!-- Conexión a dispositivos BLE -->
+	<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+	<!-- Anuncio de servicios BLE (solo si la app actúa como periférico) -->
+	<uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+
+	<!-- =====================================================
+	     PERMISOS DE LOCALIZACIÓN (Requeridos para BLE)
+	     ===================================================== -->
+	<!-- Android requiere permisos de ubicación para escanear BLE -->
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+	<!-- Opcional: Ubicación en segundo plano (solo si se requiere) -->
+	<!-- <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> -->
+
+	<!-- =====================================================
+	     CARACTERÍSTICAS DE HARDWARE
+	     ===================================================== -->
+	<!-- Bluetooth es requerido -->
+	<uses-feature
+		android:name="android.hardware.bluetooth_le"
+		android:required="true" />
+
+	<uses-feature
+		android:name="android.hardware.bluetooth"
+		android:required="true" />
+
+	<!-- Localización NO es requerida (BLE puede funcionar sin GPS) -->
+	<uses-feature
+		android:name="android.hardware.location"
+		android:required="false" />
+
+	<uses-feature
+		android:name="android.hardware.location.gps"
+		android:required="false" />
+
+	<!-- =====================================================
+	     PERMISOS ADICIONALES (Opcionales)
+	     ===================================================== -->
+	<!-- Internet (si se requiere para logging remoto o actualizaciones) -->
+	<uses-permission android:name="android.permission.INTERNET" />
+
+	<!-- Estado de red (opcional) -->
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+	<!-- =====================================================
+	     NOTAS IMPORTANTES
+	     ===================================================== -->
+	<!--
+		1. Los permisos BLUETOOTH_SCAN, BLUETOOTH_CONNECT y BLUETOOTH_ADVERTISE
+		   son para Android 12 (API 31) y superiores.
+
+		2. En Android 12+, BLUETOOTH_SCAN con flag "neverForLocation" permite
+		   escanear sin solicitar permisos de ubicación (si no se usan datos
+		   de ubicación del escaneo).
+
+		3. Para Android < 12, se requieren los permisos BLUETOOTH y BLUETOOTH_ADMIN
+		   junto con ACCESS_FINE_LOCATION.
+
+		4. Los permisos de RUNTIME (ACCESS_FINE_LOCATION, BLUETOOTH_SCAN, etc.)
+		   deben solicitarse en tiempo de ejecución en Android 6.0+.
+		   Ver MainActivity.cs para la implementación.
+
+		5. La app está configurada para Android API 21+ (Android 5.0 Lollipop).
+	-->
+
+</manifest>
