@@ -21,7 +21,7 @@ namespace InateckMauiApp;
 /// </summary>
 [Activity(
     Label = "HID Scanner",
-    Theme = "@style/Maui.SplashTheme",
+    Theme = "@style/ScannerActivityTheme",
     MainLauncher = false,
     ConfigurationChanges = ConfigChanges.ScreenSize |
                           ConfigChanges.Orientation |
@@ -74,6 +74,9 @@ public class HidScannerActivity : Activity
     {
         base.OnCreate(savedInstanceState);
         
+        // Set window background to white to override MAUI splash theme
+        Window?.SetBackgroundDrawable(new Android.Graphics.Drawables.ColorDrawable(Android.Graphics.Color.White));
+        
         // Initialize SharedPreferences for state persistence
         _prefs = GetSharedPreferences(PREFS_NAME, Android.Content.FileCreationMode.Private);
         
@@ -102,6 +105,7 @@ public class HidScannerActivity : Activity
         // Create main layout - use BeforeDescendants to allow manual input field to get focus
         // but prevent random focus changes from HID scanner
         var mainLayout = new AW.ScrollView(this);
+        mainLayout.SetBackgroundColor(Android.Graphics.Color.White);
         mainLayout.Focusable = false;
         mainLayout.FocusableInTouchMode = false;
         mainLayout.DescendantFocusability = Android.Views.DescendantFocusability.BeforeDescendants;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tema personalizado con fondo blanco para las Activities del scanner -->
+    <style name="ScannerActivityTheme" parent="@style/Maui.SplashTheme">
+        <item name="android:windowBackground">@drawable/scanner_background</item>
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:windowSplashScreenBackground" tools:targetApi="31">@android:color/white</item>
+    </style>
+</resources>

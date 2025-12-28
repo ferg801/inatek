@@ -35,8 +35,10 @@
 	     PERMISOS DE LOCALIZACIÓN - Requeridos para BLE en Android < 12
 	     ===================================================== -->
 	<!-- Ubicación requerida para BLE scanning en Android 10/11 -->
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+					android:maxSdkVersion="30" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+					android:maxSdkVersion="30" />
 
 	<!-- Opcional: Ubicación en segundo plano (solo si se requiere) -->
 	<!-- <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> -->
