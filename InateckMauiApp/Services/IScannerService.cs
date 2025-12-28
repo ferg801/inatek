@@ -17,7 +17,7 @@ namespace InateckMauiApp.Services
         /// <summary>
         /// Se dispara cuando se encuentra un dispositivo durante el escaneo.
         /// </summary>
-        event EventHandler<DeviceInfo> DeviceDiscovered;
+        event EventHandler<ScannerDeviceInfo> DeviceDiscovered;
 
         /// <summary>
         /// Se dispara cuando se reciben datos del escáner (código de barras leído).
@@ -67,7 +67,7 @@ namespace InateckMauiApp.Services
         /// <summary>
         /// Lista de dispositivos descubiertos en el último escaneo.
         /// </summary>
-        IReadOnlyList<DeviceInfo> DiscoveredDevices { get; }
+        IReadOnlyList<ScannerDeviceInfo> DiscoveredDevices { get; }
 
 
         // =====================================================
@@ -82,11 +82,18 @@ namespace InateckMauiApp.Services
         Task<bool> InitializeAsync();
 
         /// <summary>
+        /// Verifica y sincroniza el estado de Bluetooth y conexión BLE cuando la app vuelve del Stand by.
+        /// Se usa en OnAppearing para validar que la conexión sigue activa o detectar si se perdió.
+        /// </summary>
+        /// <returns>Task que retorna true si el estado está sincronizado correctamente.</returns>
+        Task<bool> VerifyAndSyncStateAsync();
+
+        /// <summary>
         /// Inicia el escaneo de dispositivos BLE.
         /// </summary>
         /// <param name="durationSeconds">Duración del escaneo en segundos.</param>
         /// <returns>Task que retorna la lista de dispositivos encontrados.</returns>
-        Task<List<DeviceInfo>> ScanForDevicesAsync(int durationSeconds = 10);
+        Task<List<ScannerDeviceInfo>> ScanForDevicesAsync(int durationSeconds = 10);
 
         /// <summary>
         /// Detiene el escaneo en curso.
@@ -131,13 +138,19 @@ namespace InateckMauiApp.Services
         /// </summary>
         /// <returns>Task que retorna true si la configuración fue exitosa.</returns>
         Task<bool> ConfigureForDataMatrixOnlyAsync();
+
+        /// <summary>
+        /// Escanea un código de barras/DataMatrix.
+        /// </summary>
+        /// <returns>El código escaneado o null si falla.</returns>
+        Task<string?> ScanBarcodeAsync();
     }
 
 
     /// <summary>
     /// Información de un dispositivo descubierto.
     /// </summary>
-    public class DeviceInfo
+    public class ScannerDeviceInfo
     {
         /// <summary>
         /// Nombre del dispositivo.
@@ -163,5 +176,4 @@ namespace InateckMauiApp.Services
         {
             return $"{Name} ({Mac}) - {ConnectionState}";
         }
-    }
-}
+    }}

@@ -1,5 +1,3 @@
-using InateckMauiApp.Views;
-
 namespace InateckMauiApp;
 
 public partial class App : Application
@@ -7,8 +5,7 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-
-        MainPage = new NavigationPage(new MainPage(
-            Handler!.MauiContext!.Services.GetRequiredService<ViewModels.MainViewModel>()));
+        // MainActivity usa UI nativa Android, no se necesita MainPage MAUI
+        MainPage = new ContentPage();
     }
 }

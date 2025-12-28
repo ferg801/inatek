@@ -1,13 +1,18 @@
-using Android;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using AndroidX.Core.App;
-using AndroidX.Core.Content;
+using Android.Util;
+using AW = Android.Widget;
 
 namespace InateckMauiApp;
 
+/// <summary>
+/// Main Menu Activity - Entry point for selecting scanner mode.
+/// Allows switching between HID mode (keyboard) and SDK mode (BLE commands).
+/// </summary>
 [Activity(
+    Label = "Inatek Scanner",
     Theme = "@style/Maui.SplashTheme",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.ScreenSize |
@@ -16,132 +21,138 @@ namespace InateckMauiApp;
                           ConfigChanges.ScreenLayout |
                           ConfigChanges.SmallestScreenSize |
                           ConfigChanges.Density)]
-public class MainActivity : MauiAppCompatActivity
+public class MainActivity : Activity
 {
-    private const int PERMISSION_REQUEST_CODE = 1001;
-
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-
-        // Solicitar permisos según la versión de Android
-        RequestNecessaryPermissions();
+        
+        Log.Info("InateckScanner", "[Menu] MainActivity OnCreate");
+        
+        // Create main layout
+        var mainLayout = new AW.LinearLayout(this)
+        {
+            Orientation = AW.Orientation.Vertical
+        };
+        mainLayout.SetPadding(40, 60, 40, 40);
+        mainLayout.SetBackgroundColor(Android.Graphics.Color.White);
+        mainLayout.SetGravity(Android.Views.GravityFlags.Center);
+        
+        // Title
+        var titleText = new AW.TextView(this)
+        {
+            Text = "📱 Inatek Scanner",
+            TextSize = 28,
+            Gravity = Android.Views.GravityFlags.Center
+        };
+        titleText.SetTextColor(Android.Graphics.Color.Black);
+        titleText.SetTypeface(null, Android.Graphics.TypefaceStyle.Bold);
+        var titleParams = new AW.LinearLayout.LayoutParams(
+            AW.LinearLayout.LayoutParams.MatchParent,
+            AW.LinearLayout.LayoutParams.WrapContent);
+        titleParams.SetMargins(0, 0, 0, 20);
+        mainLayout.AddView(titleText, titleParams);
+        
+        // Subtitle
+        var subtitleText = new AW.TextView(this)
+        {
+            Text = "Select Scanner Mode",
+            TextSize = 16,
+            Gravity = Android.Views.GravityFlags.Center
+        };
+        subtitleText.SetTextColor(Android.Graphics.Color.Gray);
+        var subtitleParams = new AW.LinearLayout.LayoutParams(
+            AW.LinearLayout.LayoutParams.MatchParent,
+            AW.LinearLayout.LayoutParams.WrapContent);
+        subtitleParams.SetMargins(0, 0, 0, 60);
+        mainLayout.AddView(subtitleText, subtitleParams);
+        
+        // ========================================
+        // HID Mode Button (Working)
+        // ========================================
+        var hidButton = new AW.Button(this)
+        {
+            Text = "🎮 HID MODE\n(Keyboard Emulation)"
+        };
+        hidButton.SetTextColor(Android.Graphics.Color.White);
+        hidButton.SetBackgroundColor(Android.Graphics.Color.ParseColor("#4CAF50")); // Green
+        hidButton.SetPadding(20, 30, 20, 30);
+        hidButton.Click += (s, e) => StartHidMode();
+        var hidParams = new AW.LinearLayout.LayoutParams(
+            AW.LinearLayout.LayoutParams.MatchParent,
+            AW.LinearLayout.LayoutParams.WrapContent);
+        hidParams.SetMargins(0, 0, 0, 20);
+        mainLayout.AddView(hidButton, hidParams);
+        
+        // HID Mode description
+        var hidDescText = new AW.TextView(this)
+        {
+            Text = "✓ Working - Scanner sends barcodes as keyboard input.\nNo SDK commands, uses standard BLE for battery/version.",
+            TextSize = 12,
+            Gravity = Android.Views.GravityFlags.Center
+        };
+        hidDescText.SetTextColor(Android.Graphics.Color.DarkGray);
+        var hidDescParams = new AW.LinearLayout.LayoutParams(
+            AW.LinearLayout.LayoutParams.MatchParent,
+            AW.LinearLayout.LayoutParams.WrapContent);
+        hidDescParams.SetMargins(0, 0, 0, 40);
+        mainLayout.AddView(hidDescText, hidDescParams);
+        
+        // ========================================
+        // SDK Mode Button (Experimental)
+        // ========================================
+        var sdkButton = new AW.Button(this)
+        {
+            Text = "📡 SDK MODE\n(BLE Commands)"
+        };
+        sdkButton.SetTextColor(Android.Graphics.Color.White);
+        sdkButton.SetBackgroundColor(Android.Graphics.Color.ParseColor("#2196F3")); // Blue
+        sdkButton.SetPadding(20, 30, 20, 30);
+        sdkButton.Click += (s, e) => StartSdkMode();
+        var sdkParams = new AW.LinearLayout.LayoutParams(
+            AW.LinearLayout.LayoutParams.MatchParent,
+            AW.LinearLayout.LayoutParams.WrapContent);
+        sdkParams.SetMargins(0, 0, 0, 20);
+        mainLayout.AddView(sdkButton, sdkParams);
+        
+        // SDK Mode description
+        var sdkDescText = new AW.TextView(this)
+        {
+            Text = "🔨 Experimental - Uses Inatek SDK BLE commands.\nAttempts to control scanner via SDK API.",
+            TextSize = 12,
+            Gravity = Android.Views.GravityFlags.Center
+        };
+        sdkDescText.SetTextColor(Android.Graphics.Color.DarkGray);
+        var sdkDescParams = new AW.LinearLayout.LayoutParams(
+            AW.LinearLayout.LayoutParams.MatchParent,
+            AW.LinearLayout.LayoutParams.WrapContent);
+        sdkDescParams.SetMargins(0, 0, 0, 40);
+        mainLayout.AddView(sdkDescText, sdkDescParams);
+        
+        // Version info
+        var versionText = new AW.TextView(this)
+        {
+            Text = "v1.0.0 - BCST-75S",
+            TextSize = 11,
+            Gravity = Android.Views.GravityFlags.Center
+        };
+        versionText.SetTextColor(Android.Graphics.Color.LightGray);
+        mainLayout.AddView(versionText);
+        
+        SetContentView(mainLayout);
     }
-
-    private void RequestNecessaryPermissions()
+    
+    private void StartHidMode()
     {
-        var permissionsToRequest = new List<string>();
-
-        // =====================================================
-        // PERMISOS PARA ANDROID 12+ (API 31+)
-        // =====================================================
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.S) // Android 12+
-        {
-            // Bluetooth Scan
-            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.BluetoothScan) != Permission.Granted)
-            {
-                permissionsToRequest.Add(Manifest.Permission.BluetoothScan);
-            }
-
-            // Bluetooth Connect
-            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.BluetoothConnect) != Permission.Granted)
-            {
-                permissionsToRequest.Add(Manifest.Permission.BluetoothConnect);
-            }
-
-            // Bluetooth Advertise (opcional, solo si se anuncia como periférico)
-            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.BluetoothAdvertise) != Permission.Granted)
-            {
-                permissionsToRequest.Add(Manifest.Permission.BluetoothAdvertise);
-            }
-        }
-
-        // =====================================================
-        // PERMISOS DE LOCALIZACIÓN (Requeridos para BLE)
-        // =====================================================
-        if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.AccessFineLocation) != Permission.Granted)
-        {
-            permissionsToRequest.Add(Manifest.Permission.AccessFineLocation);
-        }
-
-        if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.AccessCoarseLocation) != Permission.Granted)
-        {
-            permissionsToRequest.Add(Manifest.Permission.AccessCoarseLocation);
-        }
-
-        // =====================================================
-        // SOLICITAR PERMISOS SI ES NECESARIO
-        // =====================================================
-        if (permissionsToRequest.Count > 0)
-        {
-            ActivityCompat.RequestPermissions(
-                this,
-                permissionsToRequest.ToArray(),
-                PERMISSION_REQUEST_CODE
-            );
-        }
+        Log.Info("InateckScanner", "[Menu] Starting HID Mode...");
+        var intent = new Intent(this, typeof(HidScannerActivity));
+        StartActivity(intent);
     }
-
-    public override void OnRequestPermissionsResult(
-        int requestCode,
-        string[] permissions,
-        Permission[] grantResults)
+    
+    private void StartSdkMode()
     {
-        base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PERMISSION_REQUEST_CODE)
-        {
-            var allGranted = true;
-            var deniedPermissions = new List<string>();
-
-            for (int i = 0; i < permissions.Length; i++)
-            {
-                if (grantResults[i] != Permission.Granted)
-                {
-                    allGranted = false;
-                    deniedPermissions.Add(permissions[i]);
-                }
-            }
-
-            if (allGranted)
-            {
-                System.Diagnostics.Debug.WriteLine("✅ Todos los permisos fueron otorgados");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Permisos denegados: {string.Join(", ", deniedPermissions)}");
-
-                // Mostrar diálogo explicativo si es necesario
-                ShowPermissionExplanationIfNeeded(deniedPermissions);
-            }
-        }
-    }
-
-    private void ShowPermissionExplanationIfNeeded(List<string> deniedPermissions)
-    {
-        // Verificar si debemos mostrar una explicación
-        var shouldShowRationale = deniedPermissions.Any(permission =>
-            ActivityCompat.ShouldShowRequestPermissionRationale(this, permission)
-        );
-
-        if (shouldShowRationale)
-        {
-            var builder = new AndroidX.AppCompat.App.AlertDialog.Builder(this);
-            builder.SetTitle("Permisos requeridos");
-            builder.SetMessage(
-                "Esta aplicación requiere permisos de Bluetooth y Ubicación para " +
-                "escanear y conectarse al escáner Inatek.\n\n" +
-                "Sin estos permisos, la aplicación no podrá funcionar correctamente."
-            );
-            builder.SetPositiveButton("Reintentar", (sender, args) =>
-            {
-                RequestNecessaryPermissions();
-            });
-            builder.SetNegativeButton("Cancelar", (sender, args) =>
-            {
-                System.Diagnostics.Debug.WriteLine("⚠️ Usuario canceló la solicitud de permisos");
-            });
-            builder.Show();
-        }
+        Log.Info("InateckScanner", "[Menu] Starting SDK Mode...");
+        var intent = new Intent(this, typeof(SdkScannerActivity));
+        StartActivity(intent);
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		  xmlns:tools="http://schemas.android.com/tools">
 
 	<application
 		android:allowBackup="true"
@@ -31,9 +32,9 @@
 	<uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
 	<!-- =====================================================
-	     PERMISOS DE LOCALIZACIÓN (Requeridos para BLE)
+	     PERMISOS DE LOCALIZACIÓN - Requeridos para BLE en Android < 12
 	     ===================================================== -->
-	<!-- Android requiere permisos de ubicación para escanear BLE -->
+	<!-- Ubicación requerida para BLE scanning en Android 10/11 -->
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
