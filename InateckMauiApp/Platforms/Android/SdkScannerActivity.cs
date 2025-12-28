@@ -67,6 +67,11 @@ public class SdkScannerActivity : Activity
     private bool _isConnected = false;
     private List<BluetoothDevice> _discoveredDevices = new();
     
+    // Persistence for auto-reconnect
+    private const string PREFS_NAME = "SdkScannerPrefs";
+    private const string KEY_CONNECTED_MAC = "connected_mac";
+    private Android.Content.ISharedPreferences? _prefs;
+    
     // BLE Components
     private BluetoothAdapter? _bluetoothAdapter;
     private BluetoothGatt? _bluetoothGatt;
@@ -79,6 +84,9 @@ public class SdkScannerActivity : Activity
         
         Log.Info("InateckScanner", "[SDK] SdkScannerActivity OnCreate");
         
+        // Initialize SharedPreferences for state persistence
+        _prefs = GetSharedPreferences(PREFS_NAME, Android.Content.FileCreationMode.Private);
+        
         // Initialize Bluetooth
         var bluetoothManager = (BluetoothManager?)GetSystemService(BluetoothService);
         _bluetoothAdapter = bluetoothManager?.Adapter;
@@ -87,6 +95,36 @@ public class SdkScannerActivity : Activity
         RequestBluetoothPermissions();
         
         CreateUI();
+        
+        // Try to auto-reconnect to last connected device
+        TryAutoReconnect();
+    }
+    
+    private void TryAutoReconnect()
+    {
+        var savedMac = _prefs?.GetString(KEY_CONNECTED_MAC, null);
+        Log.Info("InateckScanner", $"[SDK] TryAutoReconnect: savedMac={savedMac ?? "null"}, adapter={(_bluetoothAdapter != null ? "OK" : "null")}");
+        
+        if (!string.IsNullOrEmpty(savedMac) && _bluetoothAdapter != null)
+        {
+            Log.Info("InateckScanner", $"[SDK] Attempting auto-reconnect to: {savedMac}");
+            UpdateStatus($"Reconnecting to {savedMac}...");
+            
+            try
+            {
+                var device = _bluetoothAdapter.GetRemoteDevice(savedMac);
+                if (device != null)
+                {
+                    ConnectToDevice(device);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("InateckScanner", $"[SDK] Auto-reconnect failed: {ex.Message}");
+                // Clear saved MAC if device not found
+                _prefs?.Edit()?.Remove(KEY_CONNECTED_MAC)?.Commit();
+            }
+        }
     }
     
     private void CreateUI()
@@ -486,6 +524,16 @@ public class SdkScannerActivity : Activity
     public void OnConnected()
     {
         _isConnected = true;
+        
+        // Save MAC for auto-reconnect (use Commit for synchronous save)
+        if (!string.IsNullOrEmpty(_connectedDeviceMac))
+        {
+            var editor = _prefs?.Edit();
+            editor?.PutString(KEY_CONNECTED_MAC, _connectedDeviceMac);
+            var saved = editor?.Commit() ?? false;
+            Log.Info("InateckScanner", $"[SDK] Saved MAC for auto-reconnect: {_connectedDeviceMac}, success={saved}");
+        }
+        
         RunOnUiThread(() =>
         {
             _connectionStatus!.Text = "⬤ Connected (GATT)";
@@ -795,7 +843,10 @@ public class SdkScannerActivity : Activity
     
     private async Task OnDisconnectClick()
     {
-        Log.Info("InateckScanner", "[SDK] Disconnecting...");
+        Log.Info("InateckScanner", "[SDK] Disconnecting (manual)...");
+        
+        // Clear saved MAC - user explicitly disconnected
+        _prefs?.Edit()?.Remove(KEY_CONNECTED_MAC)?.Apply();
         
         try
         {
